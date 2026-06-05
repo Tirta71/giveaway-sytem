@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giveaway Overlay</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      bottom: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0, 255, 153, 0.9);
+      animation: floatUp 1.4s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-180px) scale(0.3);
+      }
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 22px;
+      padding: 28px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,153,0.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(0,140,255,0.16), transparent 36%),
+        linear-gradient(135deg, rgba(0,0,0,0.90), rgba(18,18,18,0.86));
+      box-shadow: 0 0 48px rgba(0,255,153,0.28);
+      border: 1px solid rgba(255,255,255,0.16);
+      animation: overlayIn 0.7s ease;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    @keyframes overlayIn {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      flex-shrink: 0;
+    }
+
+    .title-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .title {
+      font-size: 44px;
+      font-weight: 950;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 18px rgba(0,255,153,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .subtitle {
+      font-size: 19px;
+      opacity: 0.85;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-card {
+      width: 235px;
+      padding: 15px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .status-label {
+      font-size: 15px;
+      opacity: 0.75;
+      margin-bottom: 4px;
+    }
+
+    .status {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .badge-open {
+      color: #00ff99;
+    }
+
+    .badge-close {
+      color: #ffcc00;
+    }
+
+    .middle-row {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 18px;
+      margin-top: 22px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .left-panel,
+    .right-panel {
+      border-radius: 26px;
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.13);
+      padding: 18px;
+      min-height: 0;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .count-label {
+      font-size: 18px;
+      opacity: 0.78;
+      text-align: center;
+    }
+
+    .count {
+      font-size: 92px;
+      font-weight: 950;
+      line-height: 1;
+      text-align: center;
+      margin: 8px 0 18px;
+    }
+
+    .count.bump {
+      animation: bump 0.38s ease;
+    }
+
+    @keyframes bump {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.22);
+        color: #00ff99;
+        text-shadow: 0 0 24px rgba(0,255,153,0.85);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .join-info {
+      text-align: center;
+      font-size: 18px;
+      opacity: 0.88;
+      margin-top: 8px;
+    }
+
+    .keyword {
+      display: block;
+      width: fit-content;
+      margin: 10px auto 0;
+      font-size: 36px;
+      font-weight: 950;
+      padding: 12px 30px;
+      border-radius: 18px;
+      background: rgba(0,255,153,0.18);
+      border: 1px solid rgba(0,255,153,0.42);
+      box-shadow: 0 0 26px rgba(0,255,153,0.22);
+      animation: pulseKeyword 1.45s infinite;
+    }
+
+    @keyframes pulseKeyword {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.055);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .latest-join {
+      margin-top: 18px;
+      min-height: 74px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,255,153,0.10);
+      border: 1px solid rgba(0,255,153,0.24);
+      font-size: 20px;
+      font-weight: 900;
+      color: #00ff99;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      opacity: 0;
+    }
+
+    .latest-join.show {
+      animation: latestJoin 2.4s ease forwards;
+    }
+
+    @keyframes latestJoin {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.92);
+      }
+
+      15% {
+        opacity: 1;
+        transform: translateY(0) scale(1.06);
+      }
+
+      78% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      100% {
+        opacity: 0.45;
+        transform: translateY(-8px) scale(0.98);
+      }
+    }
+
+    .winner-mini {
+      margin-top: auto;
+      display: none;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(0,255,153,0.15);
+      border: 1px solid rgba(0,255,153,0.36);
+      text-align: center;
+      animation: winnerPop 0.75s ease;
+    }
+
+    .winner-mini.show {
+      display: block;
+    }
+
+    .winner-mini-label {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 8px;
+    }
+
+    .winner-mini-name {
+      font-size: 28px;
+      font-weight: 950;
+      color: #00ff99;
+      text-shadow: 0 0 18px rgba(0,255,153,0.6);
+      word-break: break-word;
+    }
+
+    .participants-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .participants-title {
+      font-size: 24px;
+      font-weight: 950;
+    }
+
+    .participants-note {
+      font-size: 15px;
+      opacity: 0.65;
+    }
+
+    .participants-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      align-content: start;
+    }
+
+    .participants-grid.medium {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .participants-grid.large {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .participant {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.085);
+      border: 1px solid rgba(255,255,255,0.09);
+      font-size: 17px;
+      font-weight: 800;
+      overflow: hidden;
+      animation: participantIn 0.42s ease;
+    }
+
+    .participant-avatar {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .avatar-fallback {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 950;
+      color: white;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.28), transparent 40%),
+        linear-gradient(135deg, rgba(0,255,153,0.48), rgba(0,140,255,0.42));
+      text-shadow: 0 0 10px rgba(0,0,0,0.45);
+    }
+
+    .participant-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .participants-grid.medium .participant {
+      grid-template-columns: 34px minmax(0, 1fr);
+      font-size: 14px;
+      padding: 8px;
+      border-radius: 13px;
+      gap: 8px;
+    }
+
+    .participants-grid.medium .participant-avatar {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+    }
+
+    .participants-grid.large .participant {
+      grid-template-columns: 28px minmax(0, 1fr);
+      font-size: 12px;
+      padding: 7px;
+      border-radius: 12px;
+      gap: 6px;
+    }
+
+    .participants-grid.large .participant-avatar {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+    }
+
+    @keyframes participantIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes winnerPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.72);
+      }
+
+      70% {
+        opacity: 1;
+        transform: scale(1.07);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .selection-layer {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.74);
+      backdrop-filter: blur(8px);
+      z-index: 5;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .selection-layer.show {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .selection-card {
+      width: min(980px, 92vw);
+      padding: 42px;
+      border-radius: 38px;
+      background:
+        radial-gradient(circle at top, rgba(0,255,153,0.24), transparent 42%),
+        linear-gradient(145deg, rgba(12,12,12,0.98), rgba(25,25,25,0.96));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 0 70px rgba(0,255,153,0.28);
+      text-align: center;
+    }
+
+    .selection-title {
+      font-size: 36px;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .selection-subtitle {
+      font-size: 20px;
+      opacity: 0.78;
+      margin-bottom: 28px;
+    }
+
+    .shuffle-name {
+      min-height: 150px;
+      padding: 24px;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(0,255,153,0.35);
+      font-size: 54px;
+      font-weight: 950;
+      color: #ffffff;
+      text-shadow: 0 0 24px rgba(0,255,153,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: break-word;
+      animation: shufflePulse 0.22s ease infinite alternate;
+    }
+
+    .shuffle-profile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .shuffle-avatar {
+      width: 104px;
+      height: 104px;
+      min-width: 104px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 4px solid rgba(0,255,153,0.72);
+      box-shadow: 0 0 30px rgba(0,255,153,0.6);
+    }
+
+    .shuffle-text {
+      font-size: 54px;
+      font-weight: 950;
+    }
+
+    @keyframes shufflePulse {
+      from {
+        transform: scale(0.985);
+      }
+
+      to {
+        transform: scale(1.025);
+      }
+    }
+
+    .shuffle-progress {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+      margin-top: 28px;
+    }
+
+    .shuffle-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #00ff99, #ffffff, #00ff99);
+    }
+
+    .shuffle-bar.run {
+      animation: progressRun 3.7s linear forwards;
+    }
+
+    @keyframes progressRun {
+      from {
+        width: 0%;
+      }
+
+      to {
+        width: 100%;
+      }
+    }
+
+    .final-winner {
+      display: none;
+      margin-top: 26px;
+      font-size: 34px;
+      font-weight: 950;
+      color: #00ff99;
+      text-shadow: 0 0 24px rgba(0,255,153,0.8);
+      animation: finalPop 0.7s ease;
+    }
+
+    .final-winner.show {
+      display: block;
+    }
+
+    @keyframes finalPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.65);
+      }
+
+      70% {
+        opacity: 1;
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .safe-note {
+      margin-top: 18px;
+      font-size: 16px;
+      opacity: 0.58;
+    }
+
+    @media (max-width: 1000px) {
+      .overlay {
+        inset: 14px;
+        padding: 18px;
+      }
+
+      .middle-row {
+        grid-template-columns: 1fr;
+      }
+
+      .participants-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="particles" id="particles"></div>
+
+  <div class="selection-layer" id="selectionLayer">
+    <div class="selection-card">
+      <div class="selection-title">🎁 Memilih Pemenang</div>
+      <div class="selection-subtitle">Seleksi dari peserta valid yang sudah join</div>
+
+      <div class="shuffle-name" id="shuffleName">
+        <div class="shuffle-profile">
+          <div class="shuffle-avatar avatar-fallback">?</div>
+          <div class="shuffle-text">@username</div>
+        </div>
+      </div>
+
+      <div class="shuffle-progress">
+        <div class="shuffle-bar" id="shuffleBar"></div>
+      </div>
+
+      <div class="final-winner" id="finalWinner"></div>
+      <div class="safe-note">Bukan roulette. Pemenang dipilih dari daftar peserta valid.</div>
+    </div>
+  </div>
+
+  <div class="overlay">
+    <div class="top-row">
+      <div class="title-wrap">
+        <div class="title" id="overlayTitle">🎁 GIVEAWAY LIVE</div>
+        <div class="subtitle" id="overlaySubtitle">Ketik keyword di chat untuk masuk daftar peserta</div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">STATUS</div>
+        <div class="status" id="status">-</div>
+      </div>
+    </div>
+
+    <div class="middle-row">
+      <div class="left-panel">
+        <div>
+          <div class="count-label">Total Peserta</div>
+          <div class="count" id="count">0</div>
+
+          <div class="join-info">Ketik di chat:</div>
+          <div class="keyword" id="keyword">JOIN</div>
+
+          <div class="latest-join" id="latestJoin"></div>
+        </div>
+
+        <div class="winner-mini" id="winnerMini">
+          <div class="winner-mini-label">🎉 Pemenang</div>
+          <div class="winner-mini-name" id="winnerMiniName"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="participants-header">
+          <div class="participants-title">Daftar Peserta</div>
+          <div class="participants-note" id="participantsNote">0 peserta</div>
+        </div>
+
+        <div class="participants-grid" id="participantsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    const socket = io();
+
+    let previousParticipants = [];
+    let initialized = false;
+    let lastWinnerKey = null;
+    let isSelectingWinner = false;
+
+    function getUsername(user) {
+      if (typeof user === "string") return user;
+
+      return (
+        user?.username ||
+        user?.uniqueId ||
+        user?.name ||
+        user?.nickname ||
+        ""
+      );
+    }
+
+    function getAvatarUrl(user) {
+      if (typeof user === "string") return "";
+
+      return (
+        user?.avatar ||
+        user?.avatarUrl ||
+        user?.profilePictureUrl ||
+        user?.avatarThumb ||
+        user?.avatarMedium ||
+        user?.avatarLarger ||
+        user?.user?.profilePictureUrl ||
+        user?.user?.avatarThumb ||
+        user?.user?.avatarMedium ||
+        user?.user?.avatarLarger ||
+        ""
+      );
+    }
+
+    function cleanName(user) {
+      return String(getUsername(user) || "").replace(/^@/, "").trim();
+    }
+
+    function userKey(user) {
+      return cleanName(user).toLowerCase();
+    }
+
+    function shortName(user, max = 18) {
+      const name = cleanName(user);
+
+      if (name.length <= max) return name;
+
+      return name.slice(0, max - 2) + "..";
+    }
+
+    function avatarInitial(user) {
+      const name = cleanName(user);
+      return name ? name[0].toUpperCase() : "?";
+    }
+
+    function createAvatar(user, className = "participant-avatar") {
+      const avatar = getAvatarUrl(user);
+
+      if (avatar) {
+        const img = document.createElement("img");
+        img.className = className;
+        img.src = avatar;
+        img.alt = cleanName(user);
+
+        img.onerror = () => {
+          const fallback = document.createElement("div");
+          fallback.className = className + " avatar-fallback";
+          fallback.textContent = avatarInitial(user);
+          img.replaceWith(fallback);
+        };
+
+        return img;
+      }
+
+      const fallback = document.createElement("div");
+      fallback.className = className + " avatar-fallback";
+      fallback.textContent = avatarInitial(user);
+
+      return fallback;
+    }
+
+    function showJoinAnimation(user) {
+      const latestJoin = document.getElementById("latestJoin");
+
+      latestJoin.classList.remove("show");
+      void latestJoin.offsetWidth;
+
+      latestJoin.innerHTML = "";
+
+      const avatar = createAvatar(user, "participant-avatar");
+
+      const text = document.createElement("span");
+      text.textContent = `@${shortName(user, 20)} berhasil join!`;
+
+      latestJoin.appendChild(avatar);
+      latestJoin.appendChild(text);
+      latestJoin.classList.add("show");
+
+      bumpCount();
+      spawnParticles(18);
+    }
+
+    function bumpCount() {
+      const count = document.getElementById("count");
+
+      count.classList.remove("bump");
+      void count.offsetWidth;
+      count.classList.add("bump");
+    }
+
+    function spawnParticles(total = 18) {
+      const particles = document.getElementById("particles");
+
+      for (let i = 0; i < total; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+
+        const x = 15 + Math.random() * 70;
+        const delay = Math.random() * 0.25;
+        const size = 6 + Math.random() * 12;
+
+        particle.style.left = `${x}%`;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.animationDelay = `${delay}s`;
+
+        particles.appendChild(particle);
+
+        setTimeout(() => {
+          particle.remove();
+        }, 1900);
+      }
+    }
+
+    function renderParticipants(participants) {
+      const grid = document.getElementById("participantsGrid");
+      const note = document.getElementById("participantsNote");
+
+      grid.innerHTML = "";
+      grid.classList.remove("medium", "large");
+
+      if (participants.length > 24) {
+        grid.classList.add("medium");
+      }
+
+      if (participants.length > 54) {
+        grid.classList.add("large");
+      }
+
+      note.textContent = `${participants.length} peserta`;
+
+      if (participants.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "participant";
+        empty.style.gridTemplateColumns = "1fr";
+        empty.textContent = "Belum ada peserta";
+        grid.appendChild(empty);
+        return;
+      }
+
+      participants.forEach((user) => {
+        const item = document.createElement("div");
+        item.className = "participant";
+        item.title = `@${cleanName(user)}`;
+
+        const avatar = createAvatar(user, "participant-avatar");
+
+        const name = document.createElement("div");
+        name.className = "participant-name";
+
+        const maxLength =
+          participants.length > 54 ? 10 :
+          participants.length > 24 ? 13 :
+          18;
+
+        name.textContent = `@${shortName(user, maxLength)}`;
+
+        item.appendChild(avatar);
+        item.appendChild(name);
+
+        grid.appendChild(item);
+      });
+    }
+
+    function detectNewJoin(currentParticipants) {
+      if (!initialized) {
+        previousParticipants = [...currentParticipants];
+        initialized = true;
+        return;
+      }
+
+      if (currentParticipants.length > previousParticipants.length) {
+        const previousKeys = previousParticipants.map(userKey);
+
+        const newUsers = currentParticipants.filter((user) => {
+          return !previousKeys.includes(userKey(user));
+        });
+
+        const newestUser = newUsers[newUsers.length - 1];
+
+        if (newestUser) {
+          showJoinAnimation(newestUser);
+        }
+      }
+
+      previousParticipants = [...currentParticipants];
+    }
+
+    function renderShuffleUser(user) {
+      const shuffleName = document.getElementById("shuffleName");
+
+      shuffleName.innerHTML = "";
+
+      const profile = document.createElement("div");
+      profile.className = "shuffle-profile";
+
+      const avatar = createAvatar(user, "shuffle-avatar");
+
+      const name = document.createElement("div");
+      name.className = "shuffle-text";
+      name.textContent = "@" + shortName(user, 24);
+
+      profile.appendChild(avatar);
+      profile.appendChild(name);
+
+      shuffleName.appendChild(profile);
+    }
+
+    function renderWinnerMini(user) {
+      const box = document.getElementById("winnerMini");
+      const name = document.getElementById("winnerMiniName");
+
+      if (!user) {
+        box.classList.remove("show");
+        name.textContent = "";
+        return;
+      }
+
+      name.textContent = "@" + cleanName(user);
+      box.classList.add("show");
+    }
+
+    function startWinnerSelection(participants, finalWinner) {
+      if (isSelectingWinner) return;
+      if (!participants || participants.length === 0 || !finalWinner) return;
+
+      isSelectingWinner = true;
+
+      const selectionLayer = document.getElementById("selectionLayer");
+      const shuffleName = document.getElementById("shuffleName");
+      const shuffleBar = document.getElementById("shuffleBar");
+      const finalWinnerEl = document.getElementById("finalWinner");
+
+      selectionLayer.classList.add("show");
+
+      finalWinnerEl.classList.remove("show");
+      finalWinnerEl.textContent = "";
+
+      shuffleBar.classList.remove("run");
+      void shuffleBar.offsetWidth;
+      shuffleBar.classList.add("run");
+
+      let elapsed = 0;
+      let intervalDelay = 55;
+      const totalDuration = 3700;
+
+      function nextShuffle() {
+        elapsed += intervalDelay;
+
+        const randomUser = participants[Math.floor(Math.random() * participants.length)];
+        renderShuffleUser(randomUser);
+
+        if (elapsed > 1900) intervalDelay = 85;
+        if (elapsed > 2600) intervalDelay = 130;
+        if (elapsed > 3150) intervalDelay = 220;
+
+        if (elapsed < totalDuration) {
+          setTimeout(nextShuffle, intervalDelay);
+        } else {
+          shuffleName.style.animation = "none";
+          renderShuffleUser(finalWinner);
+
+          finalWinnerEl.textContent = `🎉 Pemenang: @${cleanName(finalWinner)}`;
+          finalWinnerEl.classList.add("show");
+
+          spawnParticles(44);
+
+          setTimeout(() => {
+            selectionLayer.classList.remove("show");
+            shuffleName.style.animation = "";
+            isSelectingWinner = false;
+          }, 2600);
+        }
+      }
+
+      nextShuffle();
+    }
+
+    socket.on("giveaway:update", (data) => {
+      const status = document.getElementById("status");
+      const count = document.getElementById("count");
+      const keyword = document.getElementById("keyword");
+      const overlayTitle = document.getElementById("overlayTitle");
+      const overlaySubtitle = document.getElementById("overlaySubtitle");
+
+      const participants = Array.isArray(data.participants) ? data.participants : [];
+
+      status.innerHTML = data.active
+        ? `<span class="badge-open">DIBUKA</span>`
+        : `<span class="badge-close">DITUTUP</span>`;
+
+      count.textContent = participants.length;
+      keyword.textContent = data.keyword || "JOIN";
+
+      overlayTitle.textContent = data.title || "🎁 GIVEAWAY LIVE";
+      overlaySubtitle.textContent =
+        data.subtitle || "Ketik keyword di chat untuk masuk daftar peserta";
+
+      renderParticipants(participants);
+      detectNewJoin(participants);
+      renderWinnerMini(data.winner);
+
+      if (data.winner) {
+        const winnerKey = userKey(data.winner);
+
+        if (lastWinnerKey !== winnerKey) {
+          lastWinnerKey = winnerKey;
+          startWinnerSelection(participants, data.winner);
+        }
+      } else {
+        lastWinnerKey = null;
+      }
+    });
+  </script>
+</body>
+</html>
